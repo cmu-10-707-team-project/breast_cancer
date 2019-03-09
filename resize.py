@@ -12,23 +12,23 @@ def resizeImage(dir, infile, output_dir="", size=(768,1024)):
         return
 
      if infile != outfile:
-        try :
-            im = Image.open(dir+data_dir+infile)
-            # scale
-            im.thumbnail(size, Image.ANTIALIAS)
-            # crop
-            convert = resizeimage.resize_cover(im, (450, 1024))
-            convert.save(output_dir+outfile+extension,"JPEG")
-        except IOError:
-            print("cannot reduce image for {}".format(infile))
+        #try :
+        im = Image.open(dir+"/"+data_dir+infile)
+        # scale
+        im.thumbnail(size, Image.ANTIALIAS)
+        # crop
+        convert = resizeimage.resize_cover(im, (450, 1024))
+        convert.save(output_dir+outfile+extension,"JPEG")
+        #except IOError:
+        #    print("cannot reduce image for {}".format(infile))
 
 def cmp(a, b):
     return (a > b) - (a < b)
 
 if __name__=="__main__":
-    data_dir = "test/"
+    data_dir = "original_train/"
     dir = os.getcwd()
-    output_dir = "resized_test/"
+    output_dir = "resized_train/"
 
     if not os.path.exists(os.path.join(dir,output_dir)):
         os.mkdir(output_dir)
