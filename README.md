@@ -22,4 +22,19 @@ This is available at: https://drive.google.com/drive/folders/0BzsdkU4jWx9Bb19WNn
 ### GoogLeNet
 
 
+## Run the Pipeline
+Install dependencies.
+```
+pip install -r requirements.txt
+```
+
+### Data Preprocessing
+
+#### Download Slide Images and Annotations
+`cd` into `data_process`. Make sure `credential.json` exits in `data_process`.
+```
+python --train-folder TRAIN_FOLDER --test-folder TEST_FOLDER [--dry-run]
+```
+
 ## References
+
