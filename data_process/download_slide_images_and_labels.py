@@ -14,6 +14,8 @@ from google.auth.transport.requests import Request
 
 from googleapiclient.http import MediaIoBaseDownload
 
+GOOGLE_DRIVE_FILE_LINK = 'https://drive.google.com/file/d/{}/view'
+
 FILE_LIST_PAGE_SIZE = 500
 
 CAMELYON16_FOLDER_ID = '0BzsdkU4jWx9Bb19WNndQTlUwb2M'
@@ -93,6 +95,8 @@ def _download_and_unzip_annotations(service, out_path, ann_id, dryrun=False):
         zip_ref.extractall(ann_unzipped_path)
         zip_ref.close()
 
+    os.remove(ann_zip_path)
+
 
 def _download_train_set(service, out_folder_path, train_folder_id, dryrun=False):
     items = _drive_list_files(service, train_folder_id)
@@ -105,43 +109,48 @@ def _download_train_set(service, out_folder_path, train_folder_id, dryrun=False)
         service,
         path.join(out_folder_path, 'train_annotations.zip'),
         folders['lesion_annotations.zip'],
-        dryrun=dryrun
+        dryrun=False
     )
 
     index = []
 
     for img in normal_images:
-        downloaded_name = '{}_{}_{}'.format('train', 'normal', img['name'])
+        downloaded_name = '{}_{}'.format('train', img['name'])
         _drive_download_one_file(
             service,
-            downloaded_name,
+            path.join(out_folder_path, downloaded_name),
             img['id'],
             dryrun=dryrun
         )
         ann_name = img['name'].replace('.tif', '.xml')
         index.append(
             {'image_file': downloaded_name,
+             'id': img['name'].rstrip('.tif'),
+             'google_drive_fileid': img['id'],
+             'google_drive_link': GOOGLE_DRIVE_FILE_LINK.format(img['id']),
              'label': 'normal',
              'annotation_file': path.join('train_annotations', ann_name)
              })
 
     for img in tumor_images:
-        downloaded_name = '{}_{}_{}'.format('train', 'tumor', img['name'])
+        downloaded_name = '{}_{}'.format('train', img['name'])
         _drive_download_one_file(
             service,
-            path.join(out_folder_path, '{}_{}_{}'.format(
-                'train', 'normal', img['name'])),
+            path.join(out_folder_path, downloaded_name),
             img['id'],
             dryrun=dryrun
         )
         ann_name = img['name'].replace('.tif', '.xml')
         index.append(
             {'image_file': downloaded_name,
+             'id': img['name'].rstrip('.tif'),
+             'google_drive_fileid': img['id'],
+             'google_drive_link': GOOGLE_DRIVE_FILE_LINK.format(img['id']),
              'label': 'tumor',
              'annotation_file': path.join('train_annotations', ann_name)
              })
 
-    index_df = pd.DataFrame(index)
+    index_df = pd.DataFrame(index).sort_values('id')
     index_df.to_csv(path.join(out_folder_path, 'index_train.csv'), index=None)
 
 
@@ -155,7 +164,7 @@ def _download_test_set(service, out_folder_path, test_folder_id, dryrun=False):
         service,
         path.join(out_folder_path, 'test_annotations.zip'),
         folders['lesion_annotations.zip'],
-        dryrun=dryrun
+        dryrun=False
     )
 
     _drive_download_one_file(
@@ -176,17 +185,19 @@ def _download_test_set(service, out_folder_path, test_folder_id, dryrun=False):
         ann_name = img['name'].replace('.tif', '.xml')
         index.append(
             {'image_file': img['name'],
-             'file_id': img['name'].rstrip('.tif'),
+             'id': img['name'].rstrip('.tif'),
+             'google_drive_fileid': img['id'],
+             'google_drive_link': GOOGLE_DRIVE_FILE_LINK.format(img['id']),
              'annotation_file': path.join('test_annotations', ann_name)
              })
 
-    index_df = pd.DataFrame(index).set_index('file_id')
+    index_df = pd.DataFrame(index).set_index('id')
     ref_df = pd.read_csv(
         path.join(out_folder_path, '_reference.csv'),
-        index_col='file_id',
-        names=['file_id', 'label', 'type', 'size'])
-    index_df = index_df.merge(ref_df, left_index=True, right_index=True)
-    index_df.to_csv(path.join(out_folder_path, 'index_test.csv'), index=None)
+        index_col='id',
+        names=['id', 'label', 'type', 'size'])
+    index_df = index_df.merge(ref_df, left_index=True, right_index=True).sort_index()
+    index_df.to_csv(path.join(out_folder_path, 'index_test.csv'), index_label='id')
 
     os.remove(path.join(out_folder_path, '_reference.csv'))
 
