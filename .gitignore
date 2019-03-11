@@ -102,3 +102,12 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+.idea
+
+gdown.pl/
+
+inputs
+*.pem
+data_process/credentials.json
+data_process/token.pickle
