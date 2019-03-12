@@ -80,7 +80,7 @@ def sample_one_slide_image(
             patch_id = '{}_{}_{}'.format(slide_id, x_i, y_i)
             patch_filename = '{}.jpg'.format(patch_id)
 
-            stacked = np.concatenate([slide_patch, mask_patch], axis=3)
+            stacked = np.concatenate([slide_patch, mask_patch], axis=2)
             io.imsave(path.join(output, patch_filename), stacked)
             index.append(
                 {
@@ -89,5 +89,8 @@ def sample_one_slide_image(
                     'patch_id': patch_id,
                     'slide_id': slide_id
                  })
+
+    slide.close()
+    mask.close()
 
     return pd.DataFrame(index).set_index('patch_id')
