@@ -78,7 +78,7 @@ def sample_one_slide_image(
                 PATCH_HEIGHT, DS_LEVEL0)
 
             patch_id = '{}_{}_{}'.format(slide_id, x_i, y_i)
-            patch_filename = '{}.jpg'.format(patch_id)
+            patch_filename = '{}.png'.format(patch_id)
 
             stacked = np.concatenate([slide_patch, mask_patch], axis=2)
             io.imsave(path.join(output, patch_filename), stacked)
