@@ -66,9 +66,12 @@ def sample_one_slide_image(
         else:
             neg_sample_rate = 1.
 
-    print('start sampling slide {}, {} positive samples and {} negative '
-          'samples in total, negative sampling rate is {}'.format(
-        slide_id, c['positive'], c['negative'], neg_sample_rate))
+        print('start sampling slide {}, {} positive samples and {} negative '
+              'samples in total, negative sampling rate is {}'.format(
+            slide_id, c['positive'], c['negative'], neg_sample_rate))
+    else:
+        print('start sampling slide {} negative sampling rate is {}'.format(
+            slide_id, neg_sample_rate))
 
     if dryrun:
         return
