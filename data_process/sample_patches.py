@@ -1,3 +1,4 @@
+import multiresolutionimageinterface as mir
 from collections import Counter
 from os import path
 
@@ -14,6 +15,21 @@ PATCH_WIDTH = 256
 
 DS_LEVEL0 = 0
 DS_LEVEL8 = 8
+
+
+def parse_one_annotation_list(reader, slide_path, ann_path, mask_path):
+    slide = reader.open(slide_path)
+    annotation_list = mir.AnnotationList()
+    xml_repository = mir.XmlRepository(annotation_list)
+    xml_repository.setSource(ann_path)
+    xml_repository.load()
+    annotation_mask = mir.AnnotationToMask()
+    label_map = {'_0': 1, '_1': 1, '_2': 0}
+    conversion_order = ['_0', '_1', '_2']
+    annotation_mask.convert(
+        annotation_list, mask_path, slide.getDimensions(),
+        slide.getSpacing(), label_map, conversion_order)
+    slide.close()
 
 
 def sample_one_slide_image(
@@ -94,3 +110,4 @@ def sample_one_slide_image(
     mask.close()
 
     return pd.DataFrame(index).set_index('patch_id')
+
