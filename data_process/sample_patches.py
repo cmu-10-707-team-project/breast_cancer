@@ -95,8 +95,7 @@ def sample_one_slide_image(
 
             if tumor_prob == 0:
                 # sample negative patches according to the sampling rate
-                sample = np.random.uniform(0, 1) <= neg_sample_rate
-                if not sample:
+                if np.random.uniform(0, 1) > neg_sample_rate:
                     continue
 
             slide_patch = slide.getUCharPatch(
@@ -108,7 +107,7 @@ def sample_one_slide_image(
 
             if tumor_prob == 0:
                 # construct an empty mask
-                mask_patch = np.zeros(list(slide_patch.shape[0:-1]) + [1])
+                mask_patch = np.zeros(list(slide_patch.shape[0:-1]) + [1], dtype=np.int)
 
             stacked = np.concatenate([slide_patch, mask_patch], axis=2)
             io.imsave(path.join(output, patch_filename), stacked)
@@ -126,4 +125,3 @@ def sample_one_slide_image(
         mask.close()
 
     return pd.DataFrame(index).set_index('patch_id')
-
