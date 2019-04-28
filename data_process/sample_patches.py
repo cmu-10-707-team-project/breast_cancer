@@ -33,7 +33,8 @@ def parse_one_annotation_list(reader, slide_path, ann_path, mask_path):
 
 
 def sample_one_slide_image(
-        reader, slide_id, slide_path, mask_path, output, pos_to_neg_ratio=1., dryrun=False):
+        reader, slide_id, slide_path, mask_path, output, pos_to_neg_ratio=1.,
+        neg_sample_rate=1., dryrun=False):
     slide = reader.open(slide_path)
     mask = reader.open(mask_path)
 
@@ -43,24 +44,27 @@ def sample_one_slide_image(
     slide_l8 = slide.getUCharPatch(0, 0, x_l8, y_l8, DS_LEVEL8)
     slide_l8_filtered = color.rgb2gray(filter.apply_image_filters(slide_l8))
 
-    # first pass through slide image and count # of positive/negative samples
-    c = Counter()
-    for y_i in range(0, y_l8):
-        for x_i in range(0, x_l8):
-            if slide_l8_filtered[y_i, x_i] == 0:
-                continue
+    if mask_path is not None:
+        # first pass through slide image and count # of positive/negative samples
+        c = Counter()
+        for y_i in range(0, y_l8):
+            for x_i in range(0, x_l8):
+                if slide_l8_filtered[y_i, x_i] == 0:
+                    continue
 
-            # the pixel is tissue
-            mask_patch = mask.getUCharPatch(
-                x_i * PATCH_WIDTH, y_i * PATCH_HEIGHT, PATCH_WIDTH, PATCH_HEIGHT, DS_LEVEL0)
+                # the pixel is tissue
+                mask_patch = mask.getUCharPatch(
+                    x_i * PATCH_WIDTH, y_i * PATCH_HEIGHT, PATCH_WIDTH, PATCH_HEIGHT, DS_LEVEL0)
 
-            if np.sum(mask_patch) > 0:
-                c['positive'] += 1
-            else:
-                c['negative'] += 1
+                if np.sum(mask_patch) > 0:
+                    c['positive'] += 1
+                else:
+                    c['negative'] += 1
 
-    # negative sampling rate
-    neg_sample_rate = c['positive'] / pos_to_neg_ratio / c['negative']
+        if pos_to_neg_ratio is not None:
+            neg_sample_rate = c['positive'] / pos_to_neg_ratio / c['negative']
+        else:
+            neg_sample_rate = 1.
 
     print('start sampling slide {}, {} positive samples and {} negative '
           'samples in total, negative sampling rate is {}'.format(
@@ -76,12 +80,15 @@ def sample_one_slide_image(
             if slide_l8_filtered[y_i, x_i] == 0:
                 continue
 
-            # the pixel is tissue
-            mask_patch = mask.getUCharPatch(
-                x_i * PATCH_WIDTH, y_i * PATCH_HEIGHT, PATCH_WIDTH,
-                PATCH_HEIGHT, DS_LEVEL0)
+            if mask_path is not None:
+                # the pixel is tissue
+                mask_patch = mask.getUCharPatch(
+                    x_i * PATCH_WIDTH, y_i * PATCH_HEIGHT, PATCH_WIDTH,
+                    PATCH_HEIGHT, DS_LEVEL0)
 
-            tumor_prob = np.sum(mask_patch) / (PATCH_HEIGHT * PATCH_WIDTH)
+                tumor_prob = np.sum(mask_patch) / (PATCH_HEIGHT * PATCH_WIDTH)
+            else:
+                tumor_prob = 0
 
             if tumor_prob == 0:
                 # sample negative patches according to the sampling rate
@@ -96,8 +103,13 @@ def sample_one_slide_image(
             patch_id = '{}_{}_{}'.format(slide_id, x_i, y_i)
             patch_filename = '{}.png'.format(patch_id)
 
+            if tumor_prob == 0:
+                # construct an empty mask
+                mask_patch = np.zeros(slide_patch.shape[0:-1])
+
             stacked = np.concatenate([slide_patch, mask_patch], axis=2)
             io.imsave(path.join(output, patch_filename), stacked)
+
             index.append(
                 {
                     'filename': patch_filename,
