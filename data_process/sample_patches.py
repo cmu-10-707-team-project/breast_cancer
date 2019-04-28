@@ -36,7 +36,6 @@ def sample_one_slide_image(
         reader, slide_id, slide_path, mask_path, output, pos_to_neg_ratio=1.,
         neg_sample_rate=1., dryrun=False):
     slide = reader.open(slide_path)
-    mask = reader.open(mask_path)
 
     x_l0, y_l0 = slide.getLevelDimensions(DS_LEVEL0)
     x_l8, y_l8 = (x_l0 // PATCH_WIDTH, y_l0 // PATCH_HEIGHT)
@@ -46,6 +45,7 @@ def sample_one_slide_image(
 
     if mask_path is not None:
         # first pass through slide image and count # of positive/negative samples
+        mask = reader.open(mask_path)
         c = Counter()
         for y_i in range(0, y_l8):
             for x_i in range(0, x_l8):
@@ -119,7 +119,8 @@ def sample_one_slide_image(
                  })
 
     slide.close()
-    mask.close()
+    if mask_path is not None:
+        mask.close()
 
     return pd.DataFrame(index).set_index('patch_id')
 
