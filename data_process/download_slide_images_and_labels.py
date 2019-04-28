@@ -1,18 +1,14 @@
 from __future__ import print_function
 
 import argparse
-import pickle
 import os.path
 import zipfile
 from os import path
 
 import pandas as pd
 
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
-
-from googleapiclient.http import MediaIoBaseDownload
+from data_process.google_drive_utils import create_drive_service, \
+    drive_download_one_file
 
 GOOGLE_DRIVE_FILE_LINK = 'https://drive.google.com/file/d/{}/view'
 
@@ -20,56 +16,12 @@ FILE_LIST_PAGE_SIZE = 500
 
 CAMELYON16_FOLDER_ID = '0BzsdkU4jWx9Bb19WNndQTlUwb2M'
 
-DRY_RUN = True
-
-SCOPES = ['https://www.googleapis.com/auth/drive']
-
-
-def _drive_service_init():
-    creds = None
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
-            creds = pickle.load(token)
-
-    # If there are no (valid) credentials available, let the user log in.
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
-            creds = flow.run_local_server()
-
-        # Save the credentials for the next run
-        with open('token.pickle', 'wb') as token:
-            pickle.dump(creds, token)
-
-    service = build('drive', 'v3', credentials=creds)
-
-    return service
-
 
 def _drive_list_files(service, folder_id):
     results = service.files().list(
         q=("'%s' in parents" % folder_id),
         pageSize=FILE_LIST_PAGE_SIZE, fields="nextPageToken, files(id, name)").execute()
     return results.get('files', [])
-
-
-def _drive_download_one_file(service, output_path, file_id, dryrun=False):
-    request = service.files().get_media(fileId=file_id)
-
-    print('downloading %s to %s' % (file_id, output_path))
-
-    if dryrun:
-        return
-
-    with open(output_path, 'wb') as fd:
-        downloader = MediaIoBaseDownload(fd, request)
-        done = False
-        while done is False:
-            status, done = downloader.next_chunk()
-            print("Download %d%%." % int(status.progress() * 100))
 
 
 def _extract_file_ids(items, file_names):
@@ -85,7 +37,7 @@ def _extract_file_ids(items, file_names):
 def _download_and_unzip_annotations(service, out_path, ann_id, dryrun=False):
     ann_zip_path = out_path
 
-    _drive_download_one_file(
+    drive_download_one_file(
         service, ann_zip_path, ann_id, dryrun=dryrun)
 
     if not dryrun:
@@ -116,7 +68,7 @@ def _download_train_set(service, out_folder_path, train_folder_id, dryrun=False)
 
     for img in normal_images:
         downloaded_name = '{}_{}'.format('train', img['name'])
-        _drive_download_one_file(
+        drive_download_one_file(
             service,
             path.join(out_folder_path, downloaded_name),
             img['id'],
@@ -134,7 +86,7 @@ def _download_train_set(service, out_folder_path, train_folder_id, dryrun=False)
 
     for img in tumor_images:
         downloaded_name = '{}_{}'.format('train', img['name'])
-        _drive_download_one_file(
+        drive_download_one_file(
             service,
             path.join(out_folder_path, downloaded_name),
             img['id'],
@@ -167,7 +119,7 @@ def _download_test_set(service, out_folder_path, test_folder_id, dryrun=False):
         dryrun=False
     )
 
-    _drive_download_one_file(
+    drive_download_one_file(
         service,
         path.join(out_folder_path, '_reference.csv'),
         folders['reference.csv'],
@@ -176,7 +128,7 @@ def _download_test_set(service, out_folder_path, test_folder_id, dryrun=False):
 
     index = []
     for img in images:
-        _drive_download_one_file(
+        drive_download_one_file(
             service,
             path.join(out_folder_path, img['name']),
             img['id'],
@@ -213,7 +165,7 @@ def main():
         os.makedirs(arg.train_folder, exist_ok=True)
         os.makedirs(arg.test_folder, exist_ok=True)
 
-    service = _drive_service_init()
+    service = create_drive_service()
 
     # find train and test folder
     items = _drive_list_files(service, CAMELYON16_FOLDER_ID)
