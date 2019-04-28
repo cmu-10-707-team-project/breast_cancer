@@ -108,7 +108,7 @@ def sample_one_slide_image(
 
             if tumor_prob == 0:
                 # construct an empty mask
-                mask_patch = np.zeros(slide_patch.shape[0:-1])
+                mask_patch = np.zeros(slide_patch.shape[0:-1] + [1])
 
             stacked = np.concatenate([slide_patch, mask_patch], axis=2)
             io.imsave(path.join(output, patch_filename), stacked)
