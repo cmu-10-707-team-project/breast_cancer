@@ -54,7 +54,8 @@ def sample_one_slide_image(
 
                 # the pixel is tissue
                 mask_patch = mask.getUCharPatch(
-                    x_i * PATCH_WIDTH, y_i * PATCH_HEIGHT, PATCH_WIDTH, PATCH_HEIGHT, DS_LEVEL0)
+                    x_i * PATCH_WIDTH, y_i * PATCH_HEIGHT,
+                    PATCH_WIDTH, PATCH_HEIGHT, DS_LEVEL0)
 
                 if np.sum(mask_patch) > 0:
                     c['positive'] += 1
@@ -107,7 +108,8 @@ def sample_one_slide_image(
 
             if tumor_prob == 0:
                 # construct an empty mask
-                mask_patch = np.zeros(list(slide_patch.shape[0:-1]) + [1], dtype=np.int)
+                mask_patch = np.zeros(
+                    list(slide_patch.shape[0:-1]) + [1], dtype=np.int)
 
             stacked = np.concatenate([slide_patch, mask_patch], axis=2)
             io.imsave(path.join(output, patch_filename), stacked)
