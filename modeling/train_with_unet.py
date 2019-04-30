@@ -59,7 +59,7 @@ if __name__=="__main__":
 	timestamp = datetime.now().strftime('%m-%d-%H%M%S')
 	model_path = '{}_{}.hdf5'.format(arg.model_name, timestamp)
 	model_checkpoint = ModelCheckpoint(
-		'modeling.hdf5', monitor='loss',verbose=1, save_best_only=True)
+		model_path, monitor='loss',verbose=1, save_best_only=True)
 	tensorboard = TensorBoard(
 		log_dir=arg.tensorboard_dir, write_grads=False, write_images=False)
 	earlystop = EarlyStopping(
