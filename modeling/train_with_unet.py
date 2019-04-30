@@ -54,7 +54,7 @@ if __name__=="__main__":
 		input_folder=arg.val_input_folder,
 		is_train=False)
 
-	model = unet()
+	model = unet.unet()
 
 	timestamp = datetime.now().strftime('%m-%d-%H%M%S')
 	model_path = '{}_{}.hdf5'.format(arg.model_name, timestamp)
