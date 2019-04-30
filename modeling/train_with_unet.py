@@ -52,7 +52,7 @@ if __name__=="__main__":
 		batch_size=arg.batch_size,
 		index_filepath=arg.val_index_file_path,
 		input_folder=arg.val_input_folder,
-		labeled=False)
+		labeled=True)
 
 	model = unet.unet()
 
