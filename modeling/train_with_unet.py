@@ -16,6 +16,8 @@ from keras.callbacks import ModelCheckpoint, TensorBoard, EarlyStopping
 from modeling.data_loader import KerasDataGenerator
 from modeling import unet
 
+import os
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
 # # # # # # # # # # # # #
 #   F U N C T I O N S   #

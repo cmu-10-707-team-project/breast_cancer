@@ -1,14 +1,15 @@
 # reference: https://github.com/zhixuhao/unet/
 #!/usr/bin/python
-#     file: modeling.py
+#     file: unet.py
 #   author: Ziyi Cui
 #  created: April 28th, 2019
 #  purpose: xxx
 
-from keras.layers import *
+
 # # # # # # # # # # #
 #   I M P O R T S   #
 # # # # # # # # # # #
+from keras.layers import *
 from keras.models import *
 from keras.optimizers import *
 import keras.backend as K
