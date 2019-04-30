@@ -13,7 +13,7 @@ import pandas as pd
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 curr_path = os.getcwd()
 sys.path.insert(0, curr_path + "/data_process")
-from data_loader import erasTestDataGenerator
+from data_loader import KerasTestDataGenerator
 from unet import *
 
 # # # # # # # # # # # # #
