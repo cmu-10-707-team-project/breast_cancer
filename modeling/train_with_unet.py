@@ -48,20 +48,20 @@ if __name__=="__main__":
 		batch_size =arg.batch_size,
 		index_filepath=arg.train_index_file_path,
 		input_folder=arg.train_input_folder,
-		is_train=True)
+		labeled=True)
 
 	val_gen = KerasDataGenerator(
 		batch_size=arg.batch_size,
 		index_filepath=arg.val_index_file_path,
 		input_folder=arg.val_input_folder,
-		is_train=False)
+		labeled=True)
 
 	model = unet.unet()
 
 	timestamp = datetime.now().strftime('%m-%d-%H%M%S')
 	model_path = '{}_{}.hdf5'.format(arg.model_name, timestamp)
 	model_checkpoint = ModelCheckpoint(
-		'modeling.hdf5', monitor='loss',verbose=1, save_best_only=True)
+		model_path, monitor='loss',verbose=1, save_best_only=True)
 	tensorboard = TensorBoard(
 		log_dir=arg.tensorboard_dir, write_grads=False, write_images=False)
 	earlystop = EarlyStopping(
