@@ -21,6 +21,7 @@ from unet import *
 # # # # # # # # # # # # #
 ################################################################################
 if __name__=="__main__":
+	
 	ds = KerasDataGenerator(batch_size =32,
 			index_filepath= curr_path+'/data/input/tumor_001/index.csv',\
 	        input_folder = curr_path+'/data/input/',\
@@ -30,7 +31,3 @@ if __name__=="__main__":
 	model = unet()
 	model_checkpoint = ModelCheckpoint('unet.hdf5', monitor='loss',verbose=1, save_best_only=True)
 	model.fit_generator(ds,steps_per_epoch=8,epochs=1,callbacks=[model_checkpoint])
-
-	#test_ds = KerasDataGenerator()
-	#results = model.predict_generator(test_ds,30,verbose=1)
-	#saveResult("data/test",results)
