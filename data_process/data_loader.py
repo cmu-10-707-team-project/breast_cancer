@@ -6,6 +6,8 @@ import numpy as np
 
 import tensorflow as tf
 
+from PIL import Image
+
 PATCH_SIZE = 256
 N_CHANN = 3
 
@@ -38,6 +40,46 @@ class TumorPathGenerator:
                 self.input_folder, r['slide_id'], r['filename'])
             yield patch_path
 
+class KerasDataGenerator:
+    def __init__(self, index_filepath, input_folder, is_train,batch_size):
+        self.input_folder = input_folder
+        self.batch_size = batch_size
+        index_df = pd.read_csv(index_filepath)
+
+        if is_train:
+            # re-balance
+            tumor_index = index_df.loc[index_df['tumor_prob'] > 0]
+            normal_index = index_df.loc[index_df['tumor_prob'] == 0]
+
+            # negative sampling
+            sampled_normal = normal_index.sample(
+                n=tumor_index.shape[0], replace=True)
+
+            index_df = pd.concat([tumor_index, sampled_normal], axis=0)
+
+        self.index_df = index_df
+        self.num_data = index_df.shape[0]
+    
+    def __call__(self):
+       
+        batch_data = []
+        batch_label = []
+        for idx, r in self.index_df.iterrows():
+
+            patch_path = path.join(
+                self.input_folder, r['slide_id'], r['filename'])
+
+            image = Image.open(patch_path)
+            np_img = np.asarray(image)
+            batch_data.append(np_img[:, :, 0:-1])
+            label = np_img[:, :, -1]
+            label = label[..., np.newaxis]
+            batch_label.append(label)
+          
+            if len(batch_data) == self.batch_size or idx == (self.num_data-1):
+                yield np.asarray(batch_data), np.asarray(batch_label)
+                batch_data = []
+                batch_label = []
 
 class TumorPatchDatasetInputFun:
     def __init__(self, batch_size, shuffle_buffer_size, *args, **kwargs):
