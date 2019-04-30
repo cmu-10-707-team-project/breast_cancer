@@ -32,6 +32,9 @@ class TumorPathGenerator:
 
             index_df = pd.concat([tumor_index, sampled_normal], axis=0)
 
+            # shuffle
+            index_df = index_df.sample(frac=1)
+
         self.index_df = index_df
 
     def __call__(self):
@@ -40,46 +43,6 @@ class TumorPathGenerator:
                 self.input_folder, r['slide_id'], r['filename'])
             yield patch_path
 
-class KerasDataGenerator:
-    def __init__(self, index_filepath, input_folder, is_train,batch_size):
-        self.input_folder = input_folder
-        self.batch_size = batch_size
-        index_df = pd.read_csv(index_filepath)
-
-        if is_train:
-            # re-balance
-            tumor_index = index_df.loc[index_df['tumor_prob'] > 0]
-            normal_index = index_df.loc[index_df['tumor_prob'] == 0]
-
-            # negative sampling
-            sampled_normal = normal_index.sample(
-                n=tumor_index.shape[0], replace=True)
-
-            index_df = pd.concat([tumor_index, sampled_normal], axis=0)
-
-        self.index_df = index_df
-        self.num_data = index_df.shape[0]
-    
-    def __call__(self):
-       
-        batch_data = []
-        batch_label = []
-        for idx, r in self.index_df.iterrows():
-
-            patch_path = path.join(
-                self.input_folder, r['slide_id'], r['filename'])
-
-            image = Image.open(patch_path)
-            np_img = np.asarray(image)
-            batch_data.append(np_img[:, :, 0:-1])
-            label = np_img[:, :, -1]
-            label = label[..., np.newaxis]
-            batch_label.append(label)
-          
-            if len(batch_data) == self.batch_size or idx == (self.num_data-1):
-                yield np.asarray(batch_data), np.asarray(batch_label)
-                batch_data = []
-                batch_label = []
 
 class TumorPatchDatasetInputFun:
     def __init__(self, batch_size, shuffle_buffer_size, *args, **kwargs):
@@ -116,3 +79,73 @@ class TumorPatchDatasetInputFun:
     def patch_augmentation(self, patch):
         angle = np.random.choice([0, np.pi / 2, np.pi, 1.5 * np.pi])
         return tf.contrib.image.rotate(patch, angle)
+
+
+class KerasDataGenerator:
+    def __init__(self, batch_size, index_filepath, input_folder, is_train):
+        self.batch_size = batch_size
+        self.input_folder = input_folder
+        self.is_train = is_train
+        self.index_df = pd.read_csv(index_filepath)
+        self.epoch_index_df = None
+
+    def next_epoch(self):
+        if self.is_train:
+            epoch_index_df = self.index_df
+            # re-balance
+            tumor_index = epoch_index_df.loc[
+                epoch_index_df['tumor_prob'] > 0]
+            normal_index = epoch_index_df.loc[
+                epoch_index_df['tumor_prob'] == 0]
+
+            # negative sampling
+            sampled_normal = normal_index.sample(
+                n=tumor_index.shape[0], replace=True)
+
+            epoch_index_df = pd.concat([tumor_index, sampled_normal], axis=0)
+
+            # shuffle
+            epoch_index_df = epoch_index_df.sample(frac=1)
+
+            # round
+            n_samples = epoch_index_df.shape[0] \
+                        // self.batch_size * self.batch_size
+            self.epoch_index_df = epoch_index_df.iloc[0:n_samples]
+        else:
+            # round
+            epoch_index_df = self.index_df
+            n_extra = epoch_index_df.shape[0] \
+                      - (epoch_index_df.shape[0]
+                         // self.batch_size * self.batch_size)
+            if n_extra > 0:
+                epoch_index_df = np.concatenate(
+                    [epoch_index_df, epoch_index_df.iloc[0:n_extra]])
+
+            self.epoch_index_df = epoch_index_df
+
+    def __call__(self):
+        while True:
+            self.next_epoch()
+
+            assert(self.epoch_index_df.shape[0] % self.batch_size == 0)
+
+            batch_data = np.zeros((self.batch_size, 256, 256, 3))
+            batch_label = np.zeros((self.batch_size, 256, 256))
+            batch_idx = 0
+
+            for idx, r in self.index_df.iterrows():
+                patch_path = path.join(
+                    self.input_folder, r['slide_id'], r['filename'])
+
+                image = Image.open(patch_path)
+                np_img = np.asarray(image)
+                batch_data[batch_idx] = np_img[:, :, 0:3]
+                label = np_img[:, :, -1]
+                batch_label[batch_idx] = label
+
+                batch_idx += 1
+
+                if len(batch_data) == self.batch_size:
+                    yield batch_data, batch_label
+                else:
+                    break
