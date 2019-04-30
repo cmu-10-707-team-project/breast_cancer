@@ -49,16 +49,17 @@ class TumorPathGenerator:
 
 
 class KerasDataGenerator:
-    def __init__(self, batch_size, index_filepath, input_folder, is_train):
+    def __init__(self, batch_size, index_filepath, input_folder, labeled, mask=True):
         self.batch_size = batch_size
         self.input_folder = input_folder
-        self.is_train = is_train
+        self.labeled = labeled
+        self.mask = mask
         self.index_df = pd.read_csv(index_filepath)
         self.epoch_index_df = None
 
     @property
     def steps_per_epoch(self):
-        if self.is_train:
+        if self.labeled:
             n_samples = self.index_df.loc[
                             self.index_df['tumor_prob'] > 0].shape[0] * 2
         else:
@@ -67,7 +68,7 @@ class KerasDataGenerator:
         return np.ceil(n_samples / self.batch_size).astype(np.int)
 
     def next_epoch(self):
-        if self.is_train:
+        if self.labeled:
             epoch_index_df = self.index_df
             # re-balance
             tumor_index = epoch_index_df.loc[
@@ -92,8 +93,11 @@ class KerasDataGenerator:
             self.next_epoch()
 
             batch_data = np.zeros((self.batch_size, 256, 256, 3))
-            if self.is_train:
-                batch_label = np.zeros((self.batch_size, 256, 256))
+            if self.labeled:
+                if self.mask:
+                    batch_label = np.zeros((self.batch_size, 256, 256))
+                else:
+                    batch_label = np.zeros(self.batch_size)
             batch_idx = 0
 
             for idx, r in self.epoch_index_df.iterrows():
@@ -109,14 +113,17 @@ class KerasDataGenerator:
 
                 batch_data[batch_idx] = np_img[:, :, 0:3]
 
-                if not self.is_train:
-                    label = np_img[:, :, -1]
+                if self.labeled:
+                    if self.mask:
+                        label = np_img[:, :, -1]
+                    else:
+                        label = r['tumor_prob']
                     batch_label[batch_idx] = label
 
                 batch_idx += 1
 
                 if batch_idx == self.batch_size:
-                    if self.is_train:
+                    if self.labeled:
                         yield batch_data, batch_label
                         batch_idx = 0
                         batch_data = np.zeros((self.batch_size, 256, 256, 3))
@@ -127,7 +134,7 @@ class KerasDataGenerator:
                         batch_data = np.zeros((self.batch_size, 256, 256, 3))
 
             # last batch
-            if self.is_train:
+            if self.labeled:
                 # training loops indefinitely
                 yield batch_data, batch_label
             else:

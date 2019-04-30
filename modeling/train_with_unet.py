@@ -46,13 +46,13 @@ if __name__=="__main__":
 		batch_size =arg.batch_size,
 		index_filepath=arg.train_index_file_path,
 		input_folder=arg.train_input_folder,
-		is_train=True)
+		labeled=True)
 
 	val_gen = KerasDataGenerator(
 		batch_size=arg.batch_size,
 		index_filepath=arg.val_index_file_path,
 		input_folder=arg.val_input_folder,
-		is_train=False)
+		labeled=False)
 
 	model = unet.unet()
 
