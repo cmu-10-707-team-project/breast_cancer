@@ -96,15 +96,6 @@ class KerasTestDataGenerator:
                 np_img = np.expand_dims(np_img, axis=0)
                 yield np_img
 
-    def get_index(self):
-        index = []
-        slide_id = self.test_folder.split('/')[-2]
-        for filename in os.listdir(self.test_folder):
-            if filename.endswith(".png"): 
-                patch_id = filename.split('.')[0]
-                index.append((patch_id,filename,slide_id))
-        return index
-
 
 class TumorPatchDatasetInputFun:
     def __init__(self, batch_size, shuffle_buffer_size, *args, **kwargs):
