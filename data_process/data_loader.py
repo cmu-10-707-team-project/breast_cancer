@@ -1,3 +1,5 @@
+import os
+
 from os import path, cpu_count
 
 import pandas as pd
@@ -80,6 +82,29 @@ class KerasDataGenerator:
                 yield np.asarray(batch_data), np.asarray(batch_label)
                 batch_data = []
                 batch_label = []
+
+class KerasTestDataGenerator:
+    def __init__(self,test_folder):
+        self.test_folder = test_folder
+
+    def __call__(self):
+        for filename in os.listdir(self.test_folder):
+            if filename.endswith(".png"): 
+                patch_path = self.test_folder + filename
+                image = Image.open(patch_path)
+                np_img = np.asarray(image)[:, :, 0:-1] # onyl for using training as test,need to remove
+                np_img = np.expand_dims(np_img, axis=0)
+                yield np_img
+
+    def get_index(self):
+        index = []
+        slide_id = self.test_folder.split('/')[-2]
+        for filename in os.listdir(self.test_folder):
+            if filename.endswith(".png"): 
+                patch_id = filename.split('.')[0]
+                index.append((patch_id,filename,slide_id))
+        return index
+
 
 class TumorPatchDatasetInputFun:
     def __init__(self, batch_size, shuffle_buffer_size, *args, **kwargs):
