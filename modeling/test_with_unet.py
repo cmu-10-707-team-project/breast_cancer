@@ -14,7 +14,7 @@ os.environ['KMP_DUPLICATE_LIB_OK']='True'
 curr_path = os.getcwd()
 sys.path.insert(0, curr_path + "/data_process")
 from data_loader import KerasTestDataGenerator
-from unet import *
+from modeling import *
 
 # # # # # # # # # # # # #
 #   F U N C T I O N S   #
@@ -22,7 +22,7 @@ from unet import *
 ################################################################################
 if __name__=="__main__":
 	model = unet()
-	model.load_weights('unet.hdf5')
+	model.load_weights('modeling.hdf5')
 
 	print ('...start testing...')
 	test_ds = KerasTestDataGenerator(test_folder = curr_path+'/data/test/tumor_001/')

@@ -56,6 +56,16 @@ class KerasDataGenerator:
         self.index_df = pd.read_csv(index_filepath)
         self.epoch_index_df = None
 
+    @property
+    def steps_per_epoch(self):
+        if self.is_train:
+            n_samples = self.index_df.loc[
+                            self.index_df['tumor_prob'] > 0].shape[0] * 2
+        else:
+            n_samples = self.index_df.shape[0]
+
+        return np.ceil(n_samples / self.batch_size).astype(np.int)
+
     def next_epoch(self):
         if self.is_train:
             epoch_index_df = self.index_df
@@ -73,34 +83,17 @@ class KerasDataGenerator:
 
             # shuffle
             epoch_index_df = epoch_index_df.sample(frac=1)
-
-            # round
-            n_samples = epoch_index_df.shape[0] \
-                        // self.batch_size * self.batch_size
-            self.epoch_index_df = epoch_index_df.iloc[0:n_samples]
-        else:
-            # round
-            epoch_index_df = self.index_df
-            n_extra = epoch_index_df.shape[0] \
-                      - (epoch_index_df.shape[0]
-                         // self.batch_size * self.batch_size)
-            if n_extra > 0:
-                epoch_index_df = np.concatenate(
-                    [epoch_index_df, epoch_index_df.iloc[0:n_extra]])
-
             self.epoch_index_df = epoch_index_df
+        else:
+            self.epoch_index_df = self.index_df
 
     def __call__(self):
         while True:
             self.next_epoch()
 
-            assert(self.epoch_index_df.shape[0] % self.batch_size == 0)
-
             batch_data = np.zeros((self.batch_size, 256, 256, 3))
-
-            if not self.is_train:
+            if self.is_train:
                 batch_label = np.zeros((self.batch_size, 256, 256))
-
             batch_idx = 0
 
             for idx, r in self.epoch_index_df.iterrows():
@@ -125,9 +118,21 @@ class KerasDataGenerator:
                 if batch_idx == self.batch_size:
                     if self.is_train:
                         yield batch_data, batch_label
+                        batch_idx = 0
+                        batch_data = np.zeros((self.batch_size, 256, 256, 3))
+                        batch_label = np.zeros((self.batch_size, 256, 256))
                     else:
                         yield batch_data
-                    break
+                        batch_idx = 0
+                        batch_data = np.zeros((self.batch_size, 256, 256, 3))
+
+            # last batch
+            if self.is_train:
+                # training loops indefinitely
+                yield batch_data, batch_label
+            else:
+                yield batch_data
+                raise StopIteration()
 
 
 class KerasTestDataGenerator:
@@ -179,4 +184,3 @@ class TumorPatchDatasetInputFun:
     def patch_augmentation(self, patch):
         angle = np.random.choice([0, np.pi / 2, np.pi, 1.5 * np.pi])
         return tf.contrib.image.rotate(patch, angle)
-

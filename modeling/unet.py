@@ -1,23 +1,18 @@
 # reference: https://github.com/zhixuhao/unet/
 #!/usr/bin/python
-#     file: unet.py
+#     file: modeling.py
 #   author: Ziyi Cui
 #  created: April 28th, 2019
 #  purpose: xxx
 
+from keras.layers import *
 # # # # # # # # # # #
 #   I M P O R T S   #
 # # # # # # # # # # #
-import numpy as np 
-import os
-import skimage.io as io
-import skimage.transform as trans
-import numpy as np
 from keras.models import *
-from keras.layers import *
 from keras.optimizers import *
-from keras.callbacks import ModelCheckpoint, LearningRateScheduler
-from keras import backend as keras
+import keras.backend as K
+
 
 # # # # # # # # # # # # #
 #   F U N C T I O N S   #
@@ -63,12 +58,13 @@ def unet(pretrained_weights = None,input_size = (256,256,3)):
     conv9 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv9)
     conv9 = Conv2D(2, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv9)
     conv10 = Conv2D(1, 1, activation = 'sigmoid')(conv9)
+    conv10 = Lambda(lambda x: K.squeeze(x, axis=3))(conv10)
 
     model = Model(input = inputs, output = conv10)
 
     model.compile(optimizer = Adam(lr = 1e-4), loss = 'binary_crossentropy', metrics = ['accuracy'])
     
-    #model.summary()
+    model.summary()
 
     if(pretrained_weights):
     	model.load_weights(pretrained_weights)
