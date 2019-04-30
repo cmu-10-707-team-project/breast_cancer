@@ -13,7 +13,7 @@ import pandas as pd
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 curr_path = os.getcwd()
 sys.path.insert(0, curr_path + "/data_process")
-from data_loader import erasTestDataGenerator
+from data_loader import KerasTestDataGenerator
 from unet import *
 
 # # # # # # # # # # # # #
@@ -26,14 +26,14 @@ if __name__=="__main__":
 
 	print ('...start testing...')
 	test_ds = KerasTestDataGenerator(test_folder = curr_path+'/data/test/tumor_001/')
-	index = test_ds.get_index()
 	test_ds = test_ds()
 	
 	results = model.predict_generator(test_ds,steps=5,verbose=1)
 	print ('...end testing...')
+
 	num_test_data= results.shape[0]
 	prob = np.average(results.reshape(num_test_data,-1),axis=1)
 	
-	df = pd.DataFrame(index,columns=['patch_id', 'filename', 'slide_id'])
+	df = pd.read_csv(curr_path+'/data/test/tumor_001/test_index.csv')
 	df['tumor_prob'] = pd.Series(prob,index=df.index)
 	df.to_csv(curr_path+'/data/test/tumor_001/'+'test_index.csv', sep=',',index = False)
