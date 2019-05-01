@@ -85,7 +85,7 @@ class KerasDataGenerator:
         else:
             # random sampling
             sampled_normal = normal_index.sample(
-                n=tumor_index.shape[0], replace=False)
+                n=tumor_index.shape[0], replace=True)
 
         epoch_index_df = pd.concat([tumor_index, sampled_normal], axis=0)
 
