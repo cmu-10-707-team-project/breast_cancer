@@ -75,7 +75,8 @@ if __name__=="__main__":
 	model_checkpoint = ModelCheckpoint(
 		path.join(arg.model_dir, arg.model_path), monitor='loss', verbose=1, save_best_only=True)
 	tensorboard = TensorBoard(
-		log_dir=arg.tensorboard_dir, write_grads=False, write_images=False)
+		log_dir=path.join(arg.tensorboard_dir, saved_model_name),
+		write_grads=False, write_images=False)
 	earlystop = EarlyStopping(
 		monitor='val_loss', patience=arg.early_stop_patience)
 

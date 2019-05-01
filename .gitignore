@@ -111,3 +111,13 @@ inputs
 *.pem
 data_process/credentials.json
 data_process/token.pickle
+
+data
+
+*.csv
+
+*.pickle
+
+scripts/
+
+*.hdf5
