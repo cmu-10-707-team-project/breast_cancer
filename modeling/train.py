@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#     file: train_with_unet.py
+#     file: train.py
 #   author: Ziyi Cui
 #  created: April 28th, 2019
 #  purpose: xxx
@@ -8,21 +8,15 @@
 #   I M P O R T S   #
 # # # # # # # # # # #
 import argparse
+import os
 from datetime import datetime
 from multiprocessing import cpu_count
 
 from keras.callbacks import ModelCheckpoint, TensorBoard, EarlyStopping
-from keras.layers import *
-from keras.models import Model
-from keras.optimizers import *
 
 from modeling.data_loader import KerasDataGenerator
-from modeling import unet
-from modeling import alexnet
-from modeling.metrics import mean_pred, false_pos_rate, false_neg_rate, \
-accuracy, logloss
+from modeling.model_factory import get_model
 
-import os
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
 # # # # # # # # # # # # #
@@ -66,54 +60,7 @@ if __name__=="__main__":
 		labeled=True, mask=label_mask)
 
 	########################
-
-	if arg.model_name == 'unet':
-		model = unet.unet()
-
-	########################
-
-	elif arg.model_name == 'alexnet':
-		model = alexnet.alexnet()
-
-	########################
-
-	elif arg.model_name == 'resnet50':
-		from keras.applications.resnet50 import ResNet50
-		base_model = ResNet50(weights='imagenet',include_top=False)
-		x = GlobalAveragePooling2D()(base_model.output)
-		x = Dense(1024, activation='relu')(x)
-		predictions = Dense(1,activation='sigmoid')(x)
-		model = Model(inputs=base_model.input, outputs=predictions)
-		model.compile(
-	        optimizer = Adam(lr = 1e-4), loss = 'binary_crossentropy',
-	        metrics=[accuracy, mean_pred, false_pos_rate, false_neg_rate, logloss])
-
-	########################
-
-	elif arg.model_name == 'vgg16':
-		from keras.applications.vgg16 import VGG16
-		base_model = VGG16(weights='imagenet',include_top=False)
-		x = GlobalAveragePooling2D()(base_model.output)
-		x = Dense(1024, activation='relu')(x)
-		predictions = Dense(1,activation='sigmoid')(x)
-		model = Model(inputs=base_model.input, outputs=predictions)
-		model.compile(
-	        optimizer = Adam(lr = 1e-4), loss = 'binary_crossentropy',
-	        metrics=[accuracy, mean_pred, false_pos_rate, false_neg_rate, logloss])
-	
-	########################
-
-	elif arg.model_name == 'vgg19':
-		from keras.applications.vgg19 import VGG19
-		base_model = VGG19(weights='imagenet',include_top=False)
-		x = GlobalAveragePooling2D()(base_model.output)
-		x = Dense(1024, activation='relu')(x)
-		predictions = Dense(1,activation='sigmoid')(x)
-		model = Model(inputs=base_model.input, outputs=predictions)
-		model.compile(
-	        optimizer = Adam(lr = 1e-4), loss = 'binary_crossentropy',
-	        metrics=[accuracy, mean_pred, false_pos_rate, false_neg_rate, logloss])
-
+	model = get_model(arg.model_name)
 	########################
 
 	timestamp = datetime.now().strftime('%m-%d-%H%M%S')
@@ -125,7 +72,7 @@ if __name__=="__main__":
 		log_dir=arg.tensorboard_dir, write_grads=False, write_images=False)
 	earlystop = EarlyStopping(
 		monitor='val_loss', patience=arg.early_stop_patience)
-	
+
 
 
 	model.fit_generator(
