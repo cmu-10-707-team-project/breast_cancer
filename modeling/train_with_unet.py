@@ -80,7 +80,7 @@ if __name__=="__main__":
 	        metrics=[accuracy, mean_pred, false_pos_rate, false_neg_rate, logloss])
 
 	########################
-	elif arg.model_name == 'VGG16':
+	elif arg.model_name == 'vgg16':
 		from keras.applications.vgg16 import VGG16
 		base_model = VGG16(weights='imagenet',include_top=False)
 		x = GlobalAveragePooling2D()(base_model.output)
