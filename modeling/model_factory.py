@@ -8,16 +8,16 @@ from modeling.metrics import mean_pred, false_pos_rate, false_neg_rate, \
 accuracy, logloss
 
 
-def get_model(model_name):
+def get_model(model_name, lr, **kwargs):
     ########################
     
     if model_name == 'unet':
-        model = unet.unet()
+        model = unet.unet(lr=lr)
 
     ########################
 
-    elif arg.model_name == 'alexnet':
-        model = alexnet.alexnet()
+    elif model_name == 'alexnet':
+        model = alexnet.alexnet(lr=lr)
     
     ########################
 
@@ -29,7 +29,7 @@ def get_model(model_name):
         predictions = Dense(1,activation='sigmoid')(x)
         model = Model(inputs=base_model.input, outputs=predictions)
         model.compile(
-            optimizer = Adam(lr = 1e-4), loss = 'binary_crossentropy',
+            optimizer = Adam(lr = lr), loss = 'binary_crossentropy',
             metrics=[accuracy, mean_pred, false_pos_rate, false_neg_rate, logloss])
     
     ########################
@@ -42,13 +42,13 @@ def get_model(model_name):
         predictions = Dense(1, activation='sigmoid')(x)
         model = Model(inputs=base_model.input, outputs=predictions)
         model.compile(
-            optimizer=Adam(lr=1e-4), loss='binary_crossentropy',
+            optimizer=Adam(lr=lr), loss='binary_crossentropy',
             metrics=[accuracy, mean_pred, false_pos_rate, false_neg_rate,
                      logloss])
     
     ########################
     
-    elif arg.model_name == 'vgg19':
+    elif model_name == 'vgg19':
         from keras.applications.vgg19 import VGG19
         base_model = VGG19(weights='imagenet',include_top=False)
         x = GlobalAveragePooling2D()(base_model.output)
@@ -56,7 +56,7 @@ def get_model(model_name):
         predictions = Dense(1,activation='sigmoid')(x)
         model = Model(inputs=base_model.input, outputs=predictions)
         model.compile(
-            optimizer = Adam(lr = 1e-4), loss = 'binary_crossentropy',
+            optimizer = Adam(lr = lr), loss = 'binary_crossentropy',
             metrics=[accuracy, mean_pred, false_pos_rate, false_neg_rate, logloss])
 
     ########################

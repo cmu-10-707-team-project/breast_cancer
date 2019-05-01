@@ -22,7 +22,7 @@ from modeling.metrics import mean_pred, false_pos_rate, false_neg_rate, \
     accuracy, logloss
 
 
-def unet(pretrained_weights = None,input_size = (256,256,3)):
+def unet(pretrained_weights = None,input_size = (256,256,3), lr=1e-4, **kwargs):
     inputs = Input(input_size)
     conv1 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(inputs)
     conv1 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv1)
@@ -68,7 +68,7 @@ def unet(pretrained_weights = None,input_size = (256,256,3)):
     model = Model(input = inputs, output = conv10)
 
     model.compile(
-        optimizer = Adam(lr = 1e-4), loss = 'binary_crossentropy',
+        optimizer = Adam(lr = lr), loss = 'binary_crossentropy',
         metrics=[accuracy, mean_pred, false_pos_rate, false_neg_rate, logloss])
     
     model.summary()

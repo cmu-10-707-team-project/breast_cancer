@@ -22,7 +22,7 @@ from modeling.metrics import mean_pred, false_pos_rate, false_neg_rate, \
 # # # # # # # # # # # # #
 #   F U N C T I O N S   #
 # # # # # # # # # # # # #
-def alexnet(pretrained_weights=None):
+def alexnet(pretrained_weights=None, lr=1e-3):
 	model = Sequential()
 
 	# 1st Convolutional Layer
@@ -80,7 +80,7 @@ def alexnet(pretrained_weights=None):
 	# Compile the model
 	
 	model.compile(
-        optimizer = Adam(lr = 1e-4), loss = 'binary_crossentropy',
+        optimizer = Adam(lr = lr), loss = 'binary_crossentropy',
         metrics=[accuracy, mean_pred, false_pos_rate, false_neg_rate, logloss])
 
 	if(pretrained_weights):

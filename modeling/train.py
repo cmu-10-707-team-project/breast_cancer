@@ -43,6 +43,8 @@ if __name__=="__main__":
 	parser.add_argument('--val-index-file-path', type=str, required=True)
 	parser.add_argument('--val-input-folder', type=str, required=True)
 
+	parser.add_argument('--learning-rate', type=float, default=1e-3)
+
 	arg = parser.parse_args()
 
 	label_mask = arg.model_name == 'unet'
@@ -60,7 +62,7 @@ if __name__=="__main__":
 		labeled=True, mask=label_mask)
 
 	########################
-	model = get_model(arg.model_name)
+	model = get_model(arg.model_name, **arg.__dict__)
 	########################
 
 	timestamp = datetime.now().strftime('%m-%d-%H%M%S')
