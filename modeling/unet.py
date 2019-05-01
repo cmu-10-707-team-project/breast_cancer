@@ -78,4 +78,3 @@ def unet(pretrained_weights = None,input_size = (256,256,3), lr=1e-4, **kwargs):
 
     return model
 
-
