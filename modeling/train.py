@@ -11,6 +11,7 @@ import argparse
 import os
 from datetime import datetime
 from multiprocessing import cpu_count
+from os import path
 
 from keras.callbacks import ModelCheckpoint, TensorBoard, EarlyStopping
 
@@ -43,7 +44,8 @@ if __name__=="__main__":
 	parser.add_argument('--val-index-file-path', type=str, required=True)
 	parser.add_argument('--val-input-folder', type=str, required=True)
 
-	parser.add_argument('--learning-rate', type=float, default=1e-3)
+	# learning rate
+	parser.add_argument('--lr', type=float, default=1e-3)
 
 	arg = parser.parse_args()
 
@@ -62,14 +64,14 @@ if __name__=="__main__":
 		labeled=True, mask=label_mask)
 
 	########################
-	model = get_model(arg.model_name, **arg.__dict__)
+	model = get_model(**arg.__dict__)
 	########################
 
 	timestamp = datetime.now().strftime('%m-%d-%H%M%S')
 	model_path = '{}_{}_{}.hdf5'.format(
 		arg.model_name, arg.model_suffix, timestamp)
 	model_checkpoint = ModelCheckpoint(
-		model_path, monitor='loss', verbose=1, save_best_only=True)
+		path.join(), monitor='loss', verbose=1, save_best_only=True)
 	tensorboard = TensorBoard(
 		log_dir=arg.tensorboard_dir, write_grads=False, write_images=False)
 	earlystop = EarlyStopping(
