@@ -9,7 +9,7 @@ accuracy, logloss
 
 
 
-def get_model(model_name, lr, weights, **kwargs):
+def get_model(model_name, lr, weights=None, **kwargs):
     ########################
     
     if model_name == 'unet':

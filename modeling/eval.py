@@ -33,7 +33,7 @@ if __name__=="__main__":
 	parser.add_argument('--lr', type=float, default=1e-3)
 
 	parser.add_argument('--batch-size', type=int, default=32)
-
+	
 	arg = parser.parse_args()
 
 	# use model to predict test data
