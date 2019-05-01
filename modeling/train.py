@@ -32,6 +32,7 @@ if __name__=="__main__":
 
 	parser.add_argument('--checkpoint-dir', type=str, default='output')
 	parser.add_argument('--tensorboard-dir', type=str, default='data/log')
+	parser.add_argument('--log-freq', type=int, default=1)
 	parser.add_argument('--model-dir', type=str, default='data/model')
 	parser.add_argument('--model-name', type=str, default="unet")
 	parser.add_argument('--model-suffix', type=str, default='')
@@ -63,7 +64,7 @@ if __name__=="__main__":
 		batch_size=arg.batch_size,
 		index_filepath=arg.val_index_file_path,
 		input_folder=arg.val_input_folder,
-		labeled=True, mask=label_mask)
+		labeled=True, mask=label_mask, eval=True)
 
 	########################
 	model = get_model(**arg.__dict__)
@@ -80,9 +81,10 @@ if __name__=="__main__":
 	earlystop = EarlyStopping(
 		monitor='val_loss', patience=arg.early_stop_patience)
 
+	steps_per_epoch = train_gen.steps_per_epoch / arg.log_freq
 	model.fit_generator(
 		train_gen(), validation_data=val_gen(),
-		steps_per_epoch=train_gen.steps_per_epoch, epochs=arg.epochs,
+		steps_per_epoch=steps_per_epoch, epochs=arg.epochs,
 		validation_steps=val_gen.steps_per_epoch,
 		use_multiprocessing=True,
 		max_queue_size=100,

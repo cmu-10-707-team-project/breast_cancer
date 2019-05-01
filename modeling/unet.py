@@ -19,7 +19,7 @@ import keras.backend as K
 #   F U N C T I O N S   #
 # # # # # # # # # # # # #
 from modeling.metrics import mean_pred, false_pos_rate, false_neg_rate, \
-    accuracy, logloss
+    accuracy, logloss, get_metrics
 
 
 def unet(pretrained_weights = None,input_size = (256,256,3), lr=1e-4, **kwargs):
@@ -69,7 +69,7 @@ def unet(pretrained_weights = None,input_size = (256,256,3), lr=1e-4, **kwargs):
 
     model.compile(
         optimizer = Adam(lr = lr), loss = 'binary_crossentropy',
-        metrics=[accuracy, mean_pred, false_pos_rate, false_neg_rate, logloss])
+        metrics=get_metrics())
     
     model.summary()
 

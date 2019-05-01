@@ -2,11 +2,9 @@ from keras import Model
 from keras.layers import GlobalAveragePooling2D, Dense
 from keras.optimizers import Adam
 
-from modeling import unet
 from modeling import alexnet
-from modeling.metrics import mean_pred, false_pos_rate, false_neg_rate, \
-accuracy, logloss
-
+from modeling import unet
+from modeling.metrics import get_metrics
 
 
 def get_model(model_name, lr, weights=None, **kwargs):
@@ -32,7 +30,7 @@ def get_model(model_name, lr, weights=None, **kwargs):
         model = Model(inputs=base_model.input, outputs=predictions)
         model.compile(
             optimizer = Adam(lr = lr), loss = 'binary_crossentropy',
-            metrics=[accuracy, mean_pred, false_pos_rate, false_neg_rate, logloss])
+            metrics=get_metrics())
     
     ########################
     
@@ -45,8 +43,7 @@ def get_model(model_name, lr, weights=None, **kwargs):
         model = Model(inputs=base_model.input, outputs=predictions)
         model.compile(
             optimizer=Adam(lr=lr), loss='binary_crossentropy',
-            metrics=[accuracy, mean_pred, false_pos_rate, false_neg_rate,
-                     logloss])
+            metrics=get_metrics())
     
     ########################
     
@@ -59,7 +56,7 @@ def get_model(model_name, lr, weights=None, **kwargs):
         model = Model(inputs=base_model.input, outputs=predictions)
         model.compile(
             optimizer = Adam(lr = lr), loss = 'binary_crossentropy',
-            metrics=[accuracy, mean_pred, false_pos_rate, false_neg_rate, logloss])
+            metrics=get_metrics())
 
     ########################
     else:

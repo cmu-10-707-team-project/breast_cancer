@@ -49,11 +49,12 @@ class TumorPathGenerator:
 
 
 class KerasDataGenerator:
-    def __init__(self, batch_size, index_filepath, input_folder, labeled, mask=True):
+    def __init__(self, batch_size, index_filepath, input_folder, labeled, mask=True, eval=False):
         self.batch_size = batch_size
         self.input_folder = input_folder
         self.labeled = labeled
         self.mask = mask
+        self.eval = eval
         self.index_df = pd.read_csv(index_filepath)
         self.epoch_index_df = None
 
@@ -68,25 +69,28 @@ class KerasDataGenerator:
         return np.ceil(n_samples / self.batch_size).astype(np.int)
 
     def next_epoch(self):
-        if self.labeled:
-            epoch_index_df = self.index_df
-            # re-balance
-            tumor_index = epoch_index_df.loc[
-                epoch_index_df['tumor_prob'] > 0]
-            normal_index = epoch_index_df.loc[
-                epoch_index_df['tumor_prob'] == 0]
+        epoch_index_df = self.index_df
+        # re-balance
+        tumor_index = epoch_index_df.loc[
+            epoch_index_df['tumor_prob'] > 0]
+        normal_index = epoch_index_df.loc[
+            epoch_index_df['tumor_prob'] == 0]
 
-            # negative sampling
+        # negative sampling
+        if self.eval:
+            # seeded sampling
             sampled_normal = normal_index.sample(
-                n=tumor_index.shape[0], replace=True)
-
-            epoch_index_df = pd.concat([tumor_index, sampled_normal], axis=0)
-
-            # shuffle
-            epoch_index_df = epoch_index_df.sample(frac=1)
-            self.epoch_index_df = epoch_index_df
+                n=tumor_index.shape[0], replace=False, random_state=10707)
         else:
-            self.epoch_index_df = self.index_df
+            # random sampling
+            sampled_normal = normal_index.sample(
+                n=tumor_index.shape[0], replace=False)
+
+        epoch_index_df = pd.concat([tumor_index, sampled_normal], axis=0)
+
+        # shuffle
+        epoch_index_df = epoch_index_df.sample(frac=1)
+        self.epoch_index_df = epoch_index_df
 
     def __call__(self):
         while True:
@@ -107,8 +111,9 @@ class KerasDataGenerator:
                 np_img = io.imread(patch_path)
 
                 # random rotation
-                degree = np.random.choice([0, 90, 180, 270])
-                np_img = rotate(np_img, degree)
+                if not self.eval:
+                    degree = np.random.choice([0, 90, 180, 270])
+                    np_img = rotate(np_img, degree)
 
                 batch_data[batch_idx] = img_as_float(np_img[:, :, 0:3])
 
@@ -141,6 +146,8 @@ class KerasDataGenerator:
                 yield batch_data, batch_label
             else:
                 yield batch_data
+
+            if not self.eval:
                 raise StopIteration()
 
 

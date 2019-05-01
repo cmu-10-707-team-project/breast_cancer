@@ -9,15 +9,12 @@
 # # # # # # # # # # #
 #   I M P O R T S   #
 # # # # # # # # # # #
-import keras
 from keras.layers import *
 from keras.models import *
 from keras.optimizers import *
-import keras.backend as K
-import tensorflow as tf
 
-from modeling.metrics import mean_pred, false_pos_rate, false_neg_rate, \
-    accuracy, logloss
+from modeling.metrics import get_metrics
+
 
 # # # # # # # # # # # # #
 #   F U N C T I O N S   #
@@ -81,7 +78,7 @@ def alexnet(pretrained_weights=None, lr=1e-3):
 	
 	model.compile(
         optimizer = Adam(lr = lr), loss = 'binary_crossentropy',
-        metrics=[accuracy, mean_pred, false_pos_rate, false_neg_rate, logloss])
+        metrics=get_metrics())
 
 	if(pretrained_weights):
 		model.load_weights(pretrained_weights)
