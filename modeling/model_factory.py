@@ -9,16 +9,16 @@ accuracy, logloss
 
 
 
-def get_model(model_name, lr, weights,weights_path, **kwargs):
+def get_model(model_name, lr, weights, **kwargs):
     ########################
     
     if model_name == 'unet':
-            model = unet.unet(lr=lr,pretrained_weights=weights_path)
+            model = unet.unet(lr=lr,pretrained_weights=weights)
 
     ########################
 
     elif model_name == 'alexnet':
-            model = alexnet.alexnet(lr=lr,pretrained_weights=weights_path)
+            model = alexnet.alexnet(lr=lr,pretrained_weights=weights)
   
 
     ########################
