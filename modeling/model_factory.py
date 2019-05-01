@@ -8,22 +8,24 @@ from modeling.metrics import mean_pred, false_pos_rate, false_neg_rate, \
 accuracy, logloss
 
 
-def get_model(model_name, lr, **kwargs):
+
+def get_model(model_name, lr, weights,weights_path, **kwargs):
     ########################
     
     if model_name == 'unet':
-        model = unet.unet(lr=lr)
+            model = unet.unet(lr=lr,pretrained_weights=weights_path)
 
     ########################
 
     elif model_name == 'alexnet':
-        model = alexnet.alexnet(lr=lr)
-    
+            model = alexnet.alexnet(lr=lr,pretrained_weights=weights_path)
+  
+
     ########################
 
     elif model_name == 'resnet50':
         from keras.applications.resnet50 import ResNet50
-        base_model = ResNet50(weights='imagenet',include_top=False)
+        base_model = ResNet50(weights=weights,include_top=False)
         x = GlobalAveragePooling2D()(base_model.output)
         x = Dense(1024, activation='relu')(x)
         predictions = Dense(1,activation='sigmoid')(x)
@@ -36,7 +38,7 @@ def get_model(model_name, lr, **kwargs):
     
     elif model_name == 'vgg16':
         from keras.applications.vgg16 import VGG16
-        base_model = VGG16(weights='imagenet', include_top=False)
+        base_model = VGG16(weights=weights, include_top=False)
         x = GlobalAveragePooling2D()(base_model.output)
         x = Dense(1024, activation='relu')(x)
         predictions = Dense(1, activation='sigmoid')(x)
@@ -50,7 +52,7 @@ def get_model(model_name, lr, **kwargs):
     
     elif model_name == 'vgg19':
         from keras.applications.vgg19 import VGG19
-        base_model = VGG19(weights='imagenet',include_top=False)
+        base_model = VGG19(weights=weights,include_top=False)
         x = GlobalAveragePooling2D()(base_model.output)
         x = Dense(1024, activation='relu')(x)
         predictions = Dense(1,activation='sigmoid')(x)
