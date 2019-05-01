@@ -127,7 +127,10 @@ class KerasDataGenerator:
                         yield batch_data, batch_label
                         batch_idx = 0
                         batch_data = np.zeros((self.batch_size, 256, 256, 3))
-                        batch_label = np.zeros((self.batch_size, 256, 256))
+                        if self.mask:
+                            batch_label = np.zeros((self.batch_size, 256, 256))
+                        else:
+                            batch_label = np.zeros(self.batch_size)
                     else:
                         yield batch_data
                         batch_idx = 0
