@@ -69,32 +69,32 @@ def unet(pretrained_weights = None,input_size = (256,256,3), lr=1e-4, **kwargs):
     merge7 = concatenate([conv3,up7], axis = 3)
 
     conv7 = Conv2D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(merge7)
-    conv7 = BatchNormalization()(conv7)
+    # conv7 = BatchNormalization()(conv7)
 
     conv7 = Conv2D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv7)
-    conv7 = BatchNormalization()(conv7)
+    # conv7 = BatchNormalization()(conv7)
 
     up8 = Conv2D(128, 2, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(UpSampling2D(size = (2,2))(conv7))
-    up8 = BatchNormalization()(up8)
+    # up8 = BatchNormalization()(up8)
     merge8 = concatenate([conv2,up8], axis = 3)
 
     conv8 = Conv2D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(merge8)
-    conv8 = BatchNormalization()(conv8)
+    # conv8 = BatchNormalization()(conv8)
     conv8 = Conv2D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv8)
-    conv8 = BatchNormalization()(conv8)
+    # conv8 = BatchNormalization()(conv8)
 
     up9 = Conv2D(64, 2, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(UpSampling2D(size = (2,2))(conv8))
-    up9 = BatchNormalization()(up9)
+    # up9 = BatchNormalization()(up9)
     merge9 = concatenate([conv1,up9], axis = 3)
 
     conv9 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(merge9)
-    conv9 = BatchNormalization()(conv9)
+    # conv9 = BatchNormalization()(conv9)
 
     conv9 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv9)
-    conv9 = BatchNormalization()(conv9)
+    # conv9 = BatchNormalization()(conv9)
 
     conv9 = Conv2D(2, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv9)
-    conv9 = BatchNormalization()(conv9)
+    # conv9 = BatchNormalization()(conv9)
 
     conv10 = Conv2D(1, 1, activation = 'sigmoid')(conv9)
 
