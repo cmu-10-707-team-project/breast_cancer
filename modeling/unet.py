@@ -28,7 +28,7 @@ def unet(pretrained_weights = None,input_size = (256,256,3), lr=1e-4, **kwargs):
                 kernel_size=(3, 3),
                 activation='elu',
                 kernel_initializer='he_normal',
-                padding='same')(normed)
+                padding='same')(inputs)
     c1 = Dropout(0.1)(c1)
     c1 = Conv2D(filters=16,
                 kernel_size=(3, 3),
