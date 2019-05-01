@@ -121,7 +121,7 @@ class KerasDataGenerator:
                     if self.mask:
                         label = np_img[:, :, -1].astype(np.float)
                     else:
-                        label = np.cast(r['tumor_prob'] > 0, np.float)
+                        label = float(r['tumor_prob'] > 0)
                     batch_label[batch_idx] = label
 
                 batch_idx += 1
