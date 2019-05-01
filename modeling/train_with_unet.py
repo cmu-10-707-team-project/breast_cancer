@@ -90,9 +90,32 @@ if __name__=="__main__":
 		model.compile(
 	        optimizer = Adam(lr = 1e-4), loss = 'binary_crossentropy',
 	        metrics=[accuracy, mean_pred, false_pos_rate, false_neg_rate, logloss])
+		
 	########################
+	elif arg.model_name == 'VGG16':
 
+		train_gen = KerasDataGenerator(
+			batch_size =arg.batch_size,
+			index_filepath=arg.train_index_file_path,
+			input_folder=arg.train_input_folder,
+			labeled=True,mask=False)
 
+		val_gen = KerasDataGenerator(
+			batch_size=arg.batch_size,
+			index_filepath=arg.val_index_file_path,
+			input_folder=arg.val_input_folder,
+			labeled=True,mask=False)
+
+		from keras.applications.vgg16 import VGG16
+		base_model = VGG16(weights='imagenet',include_top=False)
+		x = GlobalAveragePooling2D()(base_model.output)
+		x = Dense(1024, activation='relu')(x)
+		predictions = Dense(1,activation='sigmoid')(x)
+		model = Model(inputs=base_model.input, outputs=predictions)
+		model.compile(
+	        optimizer = Adam(lr = 1e-4), loss = 'binary_crossentropy',
+	        metrics=[accuracy, mean_pred, false_pos_rate, false_neg_rate, logloss])
+	########################
 	timestamp = datetime.now().strftime('%m-%d-%H%M%S')
 	model_path = '{}_{}.hdf5'.format(arg.model_name, timestamp)
 	model_checkpoint = ModelCheckpoint(
