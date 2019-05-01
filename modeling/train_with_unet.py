@@ -48,9 +48,9 @@ if __name__=="__main__":
 	parser.add_argument('--val-input-folder', type=str, required=True)
 
 	arg = parser.parse_args()
-	
+
 	########################
-	if arg.model == 'unet':
+	if arg.model_name == 'unet':
 	
 		train_gen = KerasDataGenerator(
 			batch_size =arg.batch_size,
@@ -67,7 +67,7 @@ if __name__=="__main__":
 		model = unet.unet()
 	
 	########################
-	elif arg.model == 'resnet50':
+	elif arg.model_name == 'resnet50':
 
 		train_gen = KerasDataGenerator(
 			batch_size =arg.batch_size,
