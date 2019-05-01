@@ -46,7 +46,10 @@ if __name__=="__main__":
 
 	# learning rate
 	parser.add_argument('--lr', type=float, default=1e-3)
-
+	# weight 
+	parser.add_argument('--weights', type=str, default=None)
+	parser.add_argument('--weights-path', type=str, default=None)
+	
 	arg = parser.parse_args()
 
 	label_mask = arg.model_name == 'unet'
