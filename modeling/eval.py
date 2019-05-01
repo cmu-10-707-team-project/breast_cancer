@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#     file: test_with_unet.py
+#     file: eval.py
 #   author: Ziyi Cui
 #  created: April 28th, 2019
 #  purpose: xxx
