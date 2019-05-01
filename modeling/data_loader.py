@@ -73,7 +73,9 @@ class KerasDataGenerator:
         # re-balance
         tumor_index = epoch_index_df.loc[
             epoch_index_df['tumor_prob'] > 0]
-        normal_index = epoch_index_df.loc[
+
+        normal_mask = epoch_index_df['slide_id'].map(lambda x: 'tumor' in x)
+        normal_index = epoch_index_df.loc[normal_mask &
             epoch_index_df['tumor_prob'] == 0]
 
         # negative sampling
