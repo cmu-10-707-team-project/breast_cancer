@@ -56,8 +56,8 @@ def unet(pretrained_weights = None,input_size = (256,256,3), lr=1e-4, **kwargs):
     conv5 = BatchNormalization()(conv5)
 
     up6 = Conv2D(512, 2, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(UpSampling2D(size = (2,2))(conv5))
+    up6 = BatchNormalization()(up6)
     merge6 = concatenate([conv4,up6], axis = 3)
-    merge6 = BatchNormalization()(merge6)
 
     conv6 = Conv2D(512, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(merge6)
     conv6 = BatchNormalization()(conv6)
@@ -65,8 +65,8 @@ def unet(pretrained_weights = None,input_size = (256,256,3), lr=1e-4, **kwargs):
     conv6 = BatchNormalization()(conv6)
 
     up7 = Conv2D(256, 2, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(UpSampling2D(size = (2,2))(conv6))
+    up7 = BatchNormalization()(up7)
     merge7 = concatenate([conv3,up7], axis = 3)
-    merge7 = BatchNormalization()(merge7)
 
     conv7 = Conv2D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(merge7)
     conv7 = BatchNormalization()(conv7)
@@ -75,8 +75,8 @@ def unet(pretrained_weights = None,input_size = (256,256,3), lr=1e-4, **kwargs):
     conv7 = BatchNormalization()(conv7)
 
     up8 = Conv2D(128, 2, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(UpSampling2D(size = (2,2))(conv7))
+    up8 = BatchNormalization()(up8)
     merge8 = concatenate([conv2,up8], axis = 3)
-    merge8 = BatchNormalization()(merge8)
 
     conv8 = Conv2D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(merge8)
     conv8 = BatchNormalization()(conv8)
@@ -84,8 +84,8 @@ def unet(pretrained_weights = None,input_size = (256,256,3), lr=1e-4, **kwargs):
     conv8 = BatchNormalization()(conv8)
 
     up9 = Conv2D(64, 2, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(UpSampling2D(size = (2,2))(conv8))
+    up9 = BatchNormalization()(up9)
     merge9 = concatenate([conv1,up9], axis = 3)
-    merge9 = BatchNormalization()(merge9)
 
     conv9 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(merge9)
     conv9 = BatchNormalization()(conv9)
@@ -112,4 +112,3 @@ def unet(pretrained_weights = None,input_size = (256,256,3), lr=1e-4, **kwargs):
     	model.load_weights(pretrained_weights)
 
     return model
-
