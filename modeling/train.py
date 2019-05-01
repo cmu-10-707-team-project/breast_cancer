@@ -36,7 +36,7 @@ if __name__=="__main__":
 	parser.add_argument('--model-dir', type=str, default='data/model')
 	parser.add_argument('--model-name', type=str, default="unet")
 	parser.add_argument('--model-suffix', type=str, default='')
-	parser.add_argument('--early-stop-patience', type=int, default=10)
+	parser.add_argument('--early-stop-patience', type=int, default=3)
 
 	parser.add_argument('--workers', type=int, default=cpu_count())
 

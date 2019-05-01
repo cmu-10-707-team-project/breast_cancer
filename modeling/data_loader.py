@@ -74,8 +74,8 @@ class KerasDataGenerator:
         tumor_index = epoch_index_df.loc[
             epoch_index_df['tumor_prob'] > 0.5]
 
-        normal_mask = epoch_index_df['slide_id'].map(lambda x: 'normal' in x)
-        normal_index = epoch_index_df.loc[normal_mask]
+        normal_index = epoch_index_df.loc[
+            epoch_index_df['tumor_prob'] == 0]
 
         # negative sampling
         if self.eval:
@@ -85,7 +85,7 @@ class KerasDataGenerator:
         else:
             # random sampling
             sampled_normal = normal_index.sample(
-                n=tumor_index.shape[0], replace=True)
+                n=tumor_index.shape[0], replace=False)
 
         epoch_index_df = pd.concat([tumor_index, sampled_normal], axis=0)
 
