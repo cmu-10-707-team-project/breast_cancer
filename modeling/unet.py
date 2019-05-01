@@ -10,20 +10,22 @@ import keras.backend as K
 # # # # # # # # # # #
 #   I M P O R T S   #
 # # # # # # # # # # #
-from keras.layers import *
-from keras.models import *
-from keras.optimizers import *
 
 # # # # # # # # # # # # #
 #   F U N C T I O N S   #
 # # # # # # # # # # # # #
+from keras import Input, Model
+from keras.layers import BatchNormalization, Conv2D, MaxPooling2D, concatenate, \
+    UpSampling2D, Lambda
+from keras.optimizers import Adam
+
 from modeling.metrics import get_metrics
 
 
 def unet(pretrained_weights = None,input_size = (256,256,3), lr=1e-4, **kwargs):
     inputs = Input(input_size)
     conv1 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(inputs)
-    # conv1 = BatchNormalization()(conv1)
+    conv1 = BatchNormalization()(conv1)
     conv1 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv1)
     pool1 = MaxPooling2D(pool_size=(2, 2))(conv1)
     # pool1 = BatchNormalization()(pool1)
