@@ -184,7 +184,7 @@ def unet(pretrained_weights = None,input_size = (256,256,3), lr=1e-4, **kwargs):
     output = Conv2D(filters=1,
                     kernel_size=(1, 1),
                     activation='sigmoid')(u9)
-    output = Lambda(lambda x: K.squeeze(output, axis=3))
+    output = Lambda(lambda x: K.squeeze(output, axis=3))(output)
 
     model = Model(input = inputs, output = output)
 
