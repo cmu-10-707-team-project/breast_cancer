@@ -73,6 +73,8 @@ if __name__=="__main__":
 	earlystop = EarlyStopping(
 		monitor='val_loss', patience=arg.early_stop_patience)
 
+
+
 	model.fit_generator(
 		train_gen(), validation_data=val_gen(),
 		steps_per_epoch=train_gen.steps_per_epoch, epochs=arg.epochs,
