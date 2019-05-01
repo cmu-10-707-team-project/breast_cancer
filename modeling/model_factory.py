@@ -25,7 +25,7 @@ def get_model(model_name, lr, weights=None, **kwargs):
         from keras.applications.resnet50 import ResNet50
         base_model = ResNet50(weights=weights,include_top=False)
         x = GlobalAveragePooling2D()(base_model.output)
-        x = Dense(1024, activation='relu')(x)
+        # x = Dense(1024, activation='relu')(x)
         predictions = Dense(1,activation='sigmoid')(x)
         model = Model(inputs=base_model.input, outputs=predictions)
         model.compile(
