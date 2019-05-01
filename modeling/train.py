@@ -70,10 +70,10 @@ if __name__=="__main__":
 	########################
 
 	timestamp = datetime.now().strftime('%m-%d-%H%M%S')
-	saved_model_name = '{}_{}_{}.hdf5'.format(
+	saved_model_name = '{}_{}_{}'.format(
 		arg.model_name, arg.model_suffix, timestamp)
 	model_checkpoint = ModelCheckpoint(
-		path.join(arg.model_dir, saved_model_name), monitor='loss', verbose=1, save_best_only=True)
+		path.join(arg.model_dir, saved_model_name + '.hdf5'), monitor='loss', verbose=1, save_best_only=True)
 	tensorboard = TensorBoard(
 		log_dir=path.join(arg.tensorboard_dir, saved_model_name),
 		write_grads=False, write_images=False)
