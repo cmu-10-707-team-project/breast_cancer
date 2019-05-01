@@ -77,7 +77,7 @@ if __name__=="__main__":
 		path.join(arg.model_dir, saved_model_name + '.hdf5'), monitor='loss', verbose=1, save_best_only=True)
 	tensorboard = TensorBoard(
 		log_dir=path.join(arg.tensorboard_dir, saved_model_name),
-		write_grads=False, write_images=False)
+		write_grads=False, write_images=False, update_freq=1000 // arg.batch_size)
 	earlystop = EarlyStopping(
 		monitor='val_loss', patience=arg.early_stop_patience)
 
