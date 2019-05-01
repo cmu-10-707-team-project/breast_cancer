@@ -6,20 +6,18 @@
 #  purpose: xxx
 
 
+import keras.backend as K
 # # # # # # # # # # #
 #   I M P O R T S   #
 # # # # # # # # # # #
 from keras.layers import *
 from keras.models import *
 from keras.optimizers import *
-import keras.backend as K
-
 
 # # # # # # # # # # # # #
 #   F U N C T I O N S   #
 # # # # # # # # # # # # #
-from modeling.metrics import mean_pred, false_pos_rate, false_neg_rate, \
-    accuracy, logloss, get_metrics
+from modeling.metrics import get_metrics
 
 
 def unet(pretrained_weights = None,input_size = (256,256,3), lr=1e-4, **kwargs):
@@ -53,7 +51,7 @@ def unet(pretrained_weights = None,input_size = (256,256,3), lr=1e-4, **kwargs):
     # conv5 = BatchNormalization()(conv5)
     conv5 = Conv2D(1024, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv5)
     # drop5 = Dropout(0.5)(conv5)
-    conv5 = BatchNormalization()(conv5)
+    # conv5 = BatchNormalization()(conv5)
 
     up6 = Conv2D(512, 2, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(UpSampling2D(size = (2,2))(conv5))
     # up6 = BatchNormalization()(up6)
