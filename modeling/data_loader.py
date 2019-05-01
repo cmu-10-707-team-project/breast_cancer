@@ -105,17 +105,16 @@ class KerasDataGenerator:
                     self.input_folder, r['slide_id'], r['filename'])
 
                 np_img = io.imread(patch_path)
-                np_img = img_as_float(np_img)
 
                 # random rotation
                 degree = np.random.choice([0, 90, 180, 270])
                 np_img = rotate(np_img, degree)
 
-                batch_data[batch_idx] = np_img[:, :, 0:3]
+                batch_data[batch_idx] = img_as_float(np_img[:, :, 0:3])
 
                 if self.labeled:
                     if self.mask:
-                        label = np_img[:, :, -1]
+                        label = np_img[:, :, -1].astype(np.float)
                     else:
                         label = r['tumor_prob']
                     batch_label[batch_idx] = label
