@@ -81,6 +81,15 @@ if __name__=="__main__":
 
 	########################
 	elif arg.model_name == 'VGG16':
+		from keras.applications.vgg16 import VGG16
+		base_model = VGG16(weights='imagenet',include_top=False)
+		x = GlobalAveragePooling2D()(base_model.output)
+		x = Dense(1024, activation='relu')(x)
+		predictions = Dense(1,activation='sigmoid')(x)
+		model = Model(inputs=base_model.input, outputs=predictions)
+		model.compile(
+	        optimizer = Adam(lr = 1e-4), loss = 'binary_crossentropy',
+	        metrics=[accuracy, mean_pred, false_pos_rate, false_neg_rate, logloss])
 
 	timestamp = datetime.now().strftime('%m-%d-%H%M%S')
 	model_path = '{}_{}_{}.hdf5'.format(
