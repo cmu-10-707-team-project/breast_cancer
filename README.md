@@ -42,16 +42,24 @@ python --train-folder TRAIN_FOLDER --test-folder TEST_FOLDER [--dry-run]
 ### Training
 #### Download Training Set
 `cd breast_cancer`
+
 `mkdir data`
+
 `mkdir data/input`
+
 `mkdir data/log`
+
 `mkdir data/model`
+
 `aws s3 cp s3://cmu-10707-breast-cancer/dev data/input/dev`
 
 #### Training
 `screen -S training`
+
 `source activate tensorflow_p36`
+
 `export PYTHONPATH=.`
+
 Sample training command.
 ```
 python modeling/train.py --batch-size 1024 --epochs 100 --early-stop-patience 3 \
@@ -59,10 +67,14 @@ python modeling/train.py --batch-size 1024 --epochs 100 --early-stop-patience 3 
  --val-index-file-path data/input/dev/index_patch_val_split.csv --val-input-folder data/input/dev \
  --model-suffix first_run
 ```
+
+`CTRL A+D` to detach from `screen`.
 ##### Tensorboard
-Detach from `screen`.
+
 `screen -S tensorboard`
+
 `cd data/log`
+
 `tensorboard --logdir .`
 
 ## References
