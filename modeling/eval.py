@@ -34,6 +34,9 @@ if __name__=="__main__":
 
 	parser.add_argument('--batch-size', type=int, default=32)
 
+	parser.add_argument('--weights', type=str, default=None)
+	parser.add_argument('--weights-path', type=str, default=None)
+	
 	arg = parser.parse_args()
 
 	# use model to predict test data
