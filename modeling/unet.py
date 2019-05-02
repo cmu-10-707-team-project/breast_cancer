@@ -103,7 +103,7 @@ def unet(pretrained_weights = None,input_size = (256,256,3), lr=1e-4, **kwargs):
                  padding='same')(c_b)
 
     mid_prob_output = GlobalAveragePooling2D()(c_b)
-    mid_prob_output = Dense(1)(mid_prob_output)
+    mid_prob_output = Dense(1, activation='sigmoid')(mid_prob_output)
 
     u_b = Conv2DTranspose(filters=256,
                           kernel_size=(2, 2),
@@ -190,7 +190,7 @@ def unet(pretrained_weights = None,input_size = (256,256,3), lr=1e-4, **kwargs):
                     activation='sigmoid')(u9)
     mask_output = Lambda(lambda x: K.squeeze(mask_output, axis=3))(mask_output)
     prob_output = Flatten()(mask_output)
-    prob_output = Dense(1, name='prob')(prob_output)
+    prob_output = Dense(1, name='prob', activation='sigmoid')(prob_output)
 
     model = Model(input = inputs, output = [mask_output, mid_prob_output, prob_output])
 
