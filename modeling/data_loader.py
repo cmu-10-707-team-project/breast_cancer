@@ -101,10 +101,9 @@ class KerasDataGenerator:
 
             batch_data = np.zeros((self.batch_size, 256, 256, 3))
             if self.labeled:
+                batch_label = np.zeros(self.batch_size)
                 if self.mask:
-                    batch_label = np.zeros((self.batch_size, 256, 256))
-                else:
-                    batch_label = np.zeros(self.batch_size)
+                    mask_label = np.zeros((self.batch_size, 256, 256))
             batch_idx = 0
 
             for idx, r in self.epoch_index_df.iterrows():
@@ -121,23 +120,21 @@ class KerasDataGenerator:
                 batch_data[batch_idx] = img_as_float(np_img[:, :, 0:3])
 
                 if self.labeled:
-                    if self.mask:
-                        label = np_img[:, :, -1].astype(np.float)
-                    else:
-                        label = float(r['tumor_prob'] > 0)
+                    label = float(r['tumor_prob'] > 0)
                     batch_label[batch_idx] = label
+                    if self.mask:
+                        mask_label[batch_idx] = np_img[:, :, -1].astype(np.float)
 
                 batch_idx += 1
 
                 if batch_idx == self.batch_size:
                     if self.labeled:
-                        yield batch_data, batch_label
+                        yield batch_data, [mask_label, batch_label, batch_label]
                         batch_idx = 0
                         batch_data = np.zeros((self.batch_size, 256, 256, 3))
+                        batch_label = np.zeros(self.batch_size)
                         if self.mask:
-                            batch_label = np.zeros((self.batch_size, 256, 256))
-                        else:
-                            batch_label = np.zeros(self.batch_size)
+                            mask_label = np.zeros((self.batch_size, 256, 256))
                     else:
                         yield batch_data
                         batch_idx = 0
@@ -146,7 +143,10 @@ class KerasDataGenerator:
             # last batch
             if self.labeled:
                 # training loops indefinitely
-                yield batch_data, batch_label
+                if self.mask:
+                    yield batch_data, [mask_label, batch_label, batch_label]
+                else:
+                    yield batch_data, batch_label
             else:
                 yield batch_data
 

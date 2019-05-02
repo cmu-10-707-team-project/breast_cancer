@@ -15,7 +15,8 @@
 import keras.backend as K
 from keras import Input, Model
 from keras.layers import BatchNormalization, Conv2D, MaxPooling2D, concatenate, \
-    UpSampling2D, Lambda, Dropout, Conv2DTranspose, Concatenate
+    UpSampling2D, Lambda, Dropout, Conv2DTranspose, Concatenate, Dense, \
+    GlobalAveragePooling2D, Flatten
 from keras.optimizers import Adam
 
 from modeling.metrics import get_metrics
@@ -101,6 +102,9 @@ def unet(pretrained_weights = None,input_size = (256,256,3), lr=1e-4, **kwargs):
                  kernel_initializer='he_normal',
                  padding='same')(c_b)
 
+    mid_prob_output = GlobalAveragePooling2D()(c_b)
+    mid_prob_output = Dense(1)(mid_prob_output)
+
     u_b = Conv2DTranspose(filters=256,
                           kernel_size=(2, 2),
                           strides=(2, 2),
@@ -181,16 +185,18 @@ def unet(pretrained_weights = None,input_size = (256,256,3), lr=1e-4, **kwargs):
                 kernel_initializer='he_normal',
                 activation='elu')(u9)
 
-    output = Conv2D(filters=1,
+    mask_output = Conv2D(filters=1,
                     kernel_size=(1, 1),
                     activation='sigmoid')(u9)
-    output = Lambda(lambda x: K.squeeze(output, axis=3))(output)
+    mask_output = Lambda(lambda x: K.squeeze(mask_output, axis=3))(mask_output)
+    prob_output = Flatten()(mask_output)
+    prob_output = Dense(1, name='prob')(prob_output)
 
-    model = Model(input = inputs, output = output)
+    model = Model(input = inputs, output = [mask_output, mid_prob_output, prob_output])
 
     model.compile(
-        optimizer = Adam(lr = lr), loss = 'binary_crossentropy',
-        metrics=get_metrics())
+        optimizer = Adam(lr = lr), loss = 'binary_crossentropy', loss_weights=[1, 0.5, 1],
+        metrics={'prob':get_metrics()})
     
     model.summary()
 
