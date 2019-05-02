@@ -57,13 +57,13 @@ def neg_mean(y_true, y_pred):
         y_true, y_pred = _mask_to_prob(y_true, y_pred)
 
     mask = 1 - y_true
-    return K.sum(y_pred * mask) / K.sum(mask)
+    return K.sum(y_pred * mask) / K.sum(mask + K.epsilon())
 
 
 def pos_mean(y_true, y_pred):
     if len(y_true.shape) == 3:
         y_true, y_pred = _mask_to_prob(y_true, y_pred)
-    return K.sum(y_true * y_pred) / K.sum(y_true)
+    return K.sum(y_true * y_pred) / K.sum(y_true + K.epsilon())
 
 
 def neg_std(y_true, y_pred):
@@ -72,15 +72,17 @@ def neg_std(y_true, y_pred):
     mask = 1 - y_true
     mean = K.sum(y_pred * mask) / K.sum(mask)
 
-    return K.sqrt(K.sum(K.square(y_pred - mean) * mask) / K.sum(mask))
+    return K.sqrt(K.sum(K.square(y_pred - mean) * mask)
+                  / (K.sum(mask) + K.epsilon()))
 
 
 def pos_std(y_true, y_pred):
     if len(y_true.shape) == 3:
         y_true, y_pred = _mask_to_prob(y_true, y_pred)
-    mean = K.sum(y_true * y_pred) / K.sum(y_true)
+    mean = K.sum(y_true * y_pred) / (K.sum(y_true) + K.epsilon())
 
-    return K.sqrt(K.sum(K.square(y_pred - mean) * y_true) / K.sum(y_true))
+    return K.sqrt(K.sum(K.square(y_pred - mean) * y_true)
+                  / (K.sum(y_true) + K.epsilon()))
 
 
 def _mask_to_prob(y_true, y_pred):
