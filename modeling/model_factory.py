@@ -38,7 +38,7 @@ def get_model(model_name, lr, weights=None, **kwargs):
         from keras.applications.vgg16 import VGG16
         base_model = VGG16(weights=weights, include_top=False)
         x = GlobalAveragePooling2D()(base_model.output)
-        #x = Dense(1024, activation='relu')(x)
+        x = Dense(1024, activation='tanh')(x)
         predictions = Dense(1, activation='sigmoid')(x)
         model = Model(inputs= base_model.input, outputs=predictions)
         model.compile(
