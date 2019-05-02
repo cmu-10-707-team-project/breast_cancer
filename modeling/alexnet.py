@@ -52,19 +52,19 @@ def alexnet(pretrained_weights=None, lr=1e-3):
 	model.add(Flatten())
 	# 1st Fully Connected Layer
 	model.add(Dense(4096, input_shape=(256*256*3,)))
-	model.add(Activation('relu'))
+	model.add(Activation('tanh'))
 	# Add Dropout to prevent overfitting
 	model.add(Dropout(0.4))
 
 	# 2nd Fully Connected Layer
 	model.add(Dense(4096))
-	model.add(Activation('relu'))
+	model.add(Activation('tanh'))
 	# Add Dropout
 	model.add(Dropout(0.4))
 
 	# 3rd Fully Connected Layer
 	model.add(Dense(1000))
-	model.add(Activation('relu'))
+	model.add(Activation('tanh'))
 	# Add Dropout
 	model.add(Dropout(0.4))
 

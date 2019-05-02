@@ -80,6 +80,7 @@ class KerasDataGenerator:
         # negative sampling
         if self.eval:
             # seeded sampling
+            tumor_index = epoch_index_df.sample(frac=0.01, random_state=10707)
             sampled_normal = normal_index.sample(
                 n=tumor_index.shape[0], replace=False, random_state=10707)
         else:
