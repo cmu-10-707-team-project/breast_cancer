@@ -32,7 +32,7 @@ if __name__=="__main__":
 
 	parser.add_argument('--checkpoint-dir', type=str, default='output')
 	parser.add_argument('--tensorboard-dir', type=str, default='data/log')
-	parser.add_argument('--log-freq', type=int, default=1)
+	parser.add_argument('--log-freq', type=int, default=10)
 	parser.add_argument('--model-dir', type=str, default='data/model')
 	parser.add_argument('--model-name', type=str, default="unet")
 	parser.add_argument('--model-suffix', type=str, default='')
@@ -76,8 +76,7 @@ if __name__=="__main__":
 	model_checkpoint = ModelCheckpoint(
 		path.join(arg.model_dir, saved_model_name + '.hdf5'), monitor='loss', verbose=1, save_best_only=True)
 	tensorboard = TensorBoard(
-		log_dir=path.join(arg.tensorboard_dir, saved_model_name),
-		write_grads=True, write_images=True, histogram_freq=5000 // arg.batch_size, update_freq=5000 // arg.batch_size)
+		log_dir=path.join(arg.tensorboard_dir, saved_model_name), write_images=True, histogram_freq=1, update_freq=2000)
 	earlystop = EarlyStopping(
 		monitor='val_loss', patience=arg.early_stop_patience)
 
