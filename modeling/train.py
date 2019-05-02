@@ -76,8 +76,7 @@ if __name__=="__main__":
 	model_checkpoint = ModelCheckpoint(
 		path.join(arg.model_dir, saved_model_name + '.hdf5'), monitor='loss', verbose=1, save_best_only=True)
 	tensorboard = TensorBoard(
-		log_dir=path.join(arg.tensorboard_dir, saved_model_name),
-		write_grads=True, write_images=True, histogram_freq=5000 // arg.batch_size, update_freq=5000 // arg.batch_size)
+		log_dir=path.join(arg.tensorboard_dir, saved_model_name), write_images=True, histogram_freq=1)
 	earlystop = EarlyStopping(
 		monitor='val_loss', patience=arg.early_stop_patience)
 

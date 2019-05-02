@@ -89,8 +89,9 @@ class KerasDataGenerator:
 
         epoch_index_df = pd.concat([tumor_index, sampled_normal], axis=0)
 
-        # shuffle
-        epoch_index_df = epoch_index_df.sample(frac=1)
+        if not self.eval:
+            # shuffle
+            epoch_index_df = epoch_index_df.sample(frac=1)
         self.epoch_index_df = epoch_index_df
 
     def __call__(self):
