@@ -69,6 +69,10 @@ def alexnet(pretrained_weights=None, lr=1e-3):
 	model.add(Dropout(0.4))
 
 	# Output Layer
+	###
+	model.add(Dense(1000))
+	model.add(Activation('tanh'))
+	###
 	model.add(Dense(1))
 	model.add(Activation('sigmoid'))
 
