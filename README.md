@@ -36,6 +36,7 @@ This is available at: https://drive.google.com/drive/folders/0BzsdkU4jWx9Bb19WNn
 - Based on U-net
 - Multi-task training, segmentation task and classification task
 
+![Our model](./unet.png)
 
 
 ## Run the Pipeline
@@ -55,7 +56,9 @@ python --train-folder TRAIN_FOLDER --test-folder TEST_FOLDER [--dry-run]
 ```
 
 #### Produce Image Patches
-The patching pipeline is implemented in this [Jupyter Notebook](notebooks/Patch\ Sampling.py).
+The patching pipeline is implemented in this [Jupyter Notebook](notebooks/Patch+Sampling.py).
+
+![Image patches](./patches.png)
 
 ### Training
 #### Download Training Set
