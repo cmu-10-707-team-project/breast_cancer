@@ -55,7 +55,7 @@ python --train-folder TRAIN_FOLDER --test-folder TEST_FOLDER [--dry-run]
 ```
 
 #### Produce Image Patches
-The patching pipeline is implemented in this [notebooks/Patch\ Sampling.py](Jupyter Notebook).
+The patching pipeline is implemented in this [Jupyter Notebook](notebooks/Patch\ Sampling.py).
 
 ### Training
 #### Download Training Set
@@ -94,6 +94,4 @@ python modeling/train.py --batch-size 1024 --epochs 100 --early-stop-patience 3 
 `cd data/log`
 
 `tensorboard --logdir .`
-
-## References
 
