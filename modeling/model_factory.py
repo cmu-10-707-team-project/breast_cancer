@@ -60,6 +60,19 @@ def get_model(model_name, lr, weights=None, **kwargs):
             metrics=get_metrics())
 
     ########################
+
+    elif model_name == 'inception_v3':
+        from keras.applications.inception_v3 import InceptionV3
+        base_model = InceptionV3(weights=weights,include_top=False)
+        x = GlobalAveragePooling2D()(base_model.output)
+        #x = Dense(1024, activation='relu')(x)
+        predictions = Dense(1,activation='sigmoid')(x)
+        model = Model(inputs=base_model.input, outputs=predictions)
+        model.compile(
+            optimizer = Adam(lr = lr), loss = 'binary_crossentropy',
+            metrics=get_metrics())
+
+    ########################
     else:
         raise ValueError('unknown model')
 
