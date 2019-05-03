@@ -18,10 +18,21 @@ This is available at: https://drive.google.com/drive/folders/0BzsdkU4jWx9Bb19WNn
 - Each original input WSIs was stored as a series of tiles
 - Convert each tile into a patch
 - Use converted image patches, size of (256, 256) for training
-### U-Net
-- CNN structure
-![U-Net Structure](./unet_structure.png)
-### GoogLeNet
+- option to fine-tune on the pretrained models with imagenet weights
+
+### Resnet50
+- From Keras.Applications and with our own modifications
+- Binary classification for each patch
+### VGG19
+- From Keras.Applications and with our own modifications
+- Binary classification for each patch
+### Inception_V3
+- From Keras.Applications and with our own modifications
+- Binary classification for each patch
+### U-Net 
+- Our novel multi-tasking structure
+- Semantic Segmentation
+
 
 
 ## Run the Pipeline
