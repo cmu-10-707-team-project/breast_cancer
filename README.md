@@ -32,6 +32,9 @@ This is available at: https://drive.google.com/drive/folders/0BzsdkU4jWx9Bb19WNn
 ### U-Net 
 - Our novel multi-tasking structure
 - Semantic Segmentation
+### Our architecture
+- Based on U-net
+- Multi-task training, segmentation task and classification task
 
 
 
@@ -43,12 +46,16 @@ pip install -r requirements.txt
 
 ### Data Preprocessing
 
+
 #### Download Slide Images and Annotations
 `cd` into `data_process`. Make sure `credential.json` exits in `data_process`. With the `--dry-run` flag,
 the script will not download the slide images, but the annotations will still be downloaded.
 ```
 python --train-folder TRAIN_FOLDER --test-folder TEST_FOLDER [--dry-run]
 ```
+
+#### Produce Image Patches
+The patching pipeline is implemented in this [notebooks/Patch\ Sampling.py](Jupyter Notebook).
 
 ### Training
 #### Download Training Set
