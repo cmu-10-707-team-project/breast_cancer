@@ -56,7 +56,7 @@ python --train-folder TRAIN_FOLDER --test-folder TEST_FOLDER [--dry-run]
 ```
 
 #### Produce Image Patches
-The patching pipeline is implemented in this [Jupyter Notebook](notebooks/Patch+Sampling.py).
+The patching pipeline is implemented in this [Jupyter Notebook](notebooks/Patch_Sampling.py).
 
 ![Image patches](./patches.png)
 
